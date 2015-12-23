@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="ISO-8859-1">
+		<title>CenterPoint</title>
+   <style>
+		body{
+			background-color:#CCC;
+        	padding-bottom: 20px;
+		}
+		#map-inner{
+			height: 600px
+		}
+      	#map-outer{
+      		height: 650px;
+	  		padding: 20px; 
+			border: 2px solid #CCC; 
+			margin-bottom: 20px; 
+			background-color:#FFF
+		}
+		#panel-inner{
+			height: 600px;
+			overflow-y: scroll;
+		}
+		#panel-outer{
+      		height: 650px;
+	  		padding: 20px; 
+			border: 2px solid #CCC; 
+			margin-bottom: 20px; 
+			background-color:#FFF
+		}
+    </style>
+    	<!-- Latest compiled and minified CSS for bootstrap -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" 
+		integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+		<!-- Optional bootstrap theme -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" 
+		integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+	</head>
+	<body>
+		<div id="header"></div>
+		<div class="row">
+			<div id="map-outer" class="col-md-8 col-md-offset-1">
+	  			<div id="map-inner"></div>
+	      	</div>
+	      	<div class="col-md-2">
+	      		<div id="panel-outer" class="row">
+		      		<div id="panel-inner" class="panel panel-default">
+						<div class="panel-heading" align="middle"><strong>Points on the Map</strong></div>
+					</div>
+				</div>
+				<div align="center" class="row">
+					<button type="button" class="btn btn-default btn-lg">Find the Center Point</button>
+				</div>
+	      	</div>
+		</div>
+		<div id="footer"></div>
+	</body>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	<script
+		src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" 
+		integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
+		crossorigin="anonymous"><!-- Latest compiled and minified JavaScript -->
+	</script>
+	<script
+		src="https://maps.googleapis.com/maps/api/js?key=AIzaSyARilHXTyOd50Ad_ZhZtcSljCKyRC2QxoQ&signed_in=false">
+    </script>
+	<script>
+		$(function(){
+			$("#header").load("header.html");
+			$("#footer").load("footer.html");
+			initMap();
+		});
+		
+		function closePanel()
+		{
+			alert("close: ");
+		    $(this).parent().fadeOut();
+		}
+		
+		var initialLocation;
+		var siberia = new google.maps.LatLng(60, 105);
+		var newyork = new google.maps.LatLng(40.69847032728747, -73.9514422416687);
+		var browserSupportFlag =  new Boolean();
+		function initMap()
+		{
+			var map = new google.maps.Map(document.getElementById("map-inner"),
+			{
+				zoom: 12,
+			    mapTypeId: google.maps.MapTypeId.ROADMAP,
+			    
+			    mapTypeControl: true,
+			    mapTypeControlOptions: {
+			        style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+			        position: google.maps.ControlPosition.TOP_CENTER
+			    },
+			    zoomControl: true,
+			    zoomControlOptions: {
+			        position: google.maps.ControlPosition.LEFT_CENTER
+			    },
+			    scaleControl: true,
+			    streetViewControl: false,
+			    draggableCursor : "url(http://s3.amazonaws.com/besport.com_images/status-pin.png), auto"
+			});
+			
+			if(navigator.geolocation) // Try W3C Geolocation (Preferred)
+			{
+			 	browserSupportFlag = true;
+			    navigator.geolocation.getCurrentPosition(function(position){
+			    	initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
+			    	map.setCenter(initialLocation);
+			    	
+			    	var marker = new google.maps.Marker(
+	    			{
+	    				position: initialLocation,
+	    				title: 'Your Location',
+	    				map: map,
+	    				draggable: true,
+	    				icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+	    			});
+			    	
+					map.addListener('click', function( event )
+					{
+						var lat = event.latLng.lat();
+						var lon = event.latLng.lng();
+							
+						console.log( "Latitude: "+lat+" "+", Longitude: "+lon );
+						
+						document.getElementById('panel-inner').innerHTML += 
+							'<div class="alert alert-default alert-dismissible" role="alert">'+
+							'<button type="button" class="close" aria-hidden="true" onclick="closePanel()">&times;</button>'+
+							'<p>Latitude: ' + lat + ', Longitude: ' + lon + '</p>'+
+							'</div>'
+					});
+			    	
+				//map.controls[google.maps.ControlPosition.BOTTOM_RIGHT].push(myButton());
+			    				    	
+				}, function(){
+					handleNoGeolocation(browserSupportFlag);
+			    });
+			}
+			else // Browser doesn't support Geolocation
+			{
+				browserSupportFlag = false;
+				handleNoGeolocation(browserSupportFlag);
+			}
+			
+			function handleNoGeolocation(errorFlag){
+				if (errorFlag == true){
+					alert("Geolocation service failed.");
+			      	initialLocation = newyork;
+			    }
+				else{
+					alert("Your browser doesn't support geolocation. We've placed you in Siberia.");
+			      	initialLocation = siberia;
+			    }
+			    map.setCenter(initialLocation);
+			}
+		}
+		
+		var TILE_SIZE = 256;
+		function createInfoWindowContent(latLng, zoom) {
+		  var scale = 1 << zoom;
+
+		  var worldCoordinate = project(latLng);
+
+		  var pixelCoordinate = new google.maps.Point(
+		      Math.floor(worldCoordinate.x * scale),
+		      Math.floor(worldCoordinate.y * scale));
+
+		  var tileCoordinate = new google.maps.Point(
+		      Math.floor(worldCoordinate.x * scale / TILE_SIZE),
+		      Math.floor(worldCoordinate.y * scale / TILE_SIZE));
+
+		  return [
+		    '<STRONG>Your Location:</STRONG>',
+		    'LatLng: ' + latLng,
+		    'Zoom level: ' + zoom,
+		    'World Coordinate: ' + worldCoordinate,
+		    'Pixel Coordinate: ' + pixelCoordinate,
+		    'Tile Coordinate: ' + tileCoordinate
+		  ].join('<br>');
+		}
+
+		// The mapping between latitude, longitude and pixels is defined by the web
+		// mercator projection.
+		function project(latLng) {
+		  var siny = Math.sin(latLng.lat() * Math.PI / 180);
+
+		  // Truncating to 0.9999 effectively limits latitude to 89.189. This is
+		  // about a third of a tile past the edge of the world tile.
+		  siny = Math.min(Math.max(siny, -0.9999), 0.9999);
+
+		  return new google.maps.Point(
+		      TILE_SIZE * (0.5 + latLng.lng() / 360),
+		      TILE_SIZE * (0.5 - Math.log((1 + siny) / (1 - siny)) / (4 * Math.PI)));
+		}
+    </script>
+</html>
