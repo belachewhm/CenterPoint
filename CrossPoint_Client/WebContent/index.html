@@ -2,48 +2,8 @@
 <html>
 	<head>
 		<meta charset="ISO-8859-1">
-		<title>CenterPoint</title>
-   <style>
-		body{
-			background-color:#CCC;
-        	padding-bottom: 20px;
-		}
-		#map-inner{
-			height: 700px
-		}
-      	#map-outer{
-      		height: 750px;
-	  		padding: 20px; 
-			border: 2px solid #CCC; 
-			margin-bottom: 20px; 
-			background-color:#FFF
-		}
-		#panel-inner{
-			height: 700px;
-			overflow-y: scroll;
-		}
-		#panel-outer{
-      		height: 750px;
-	  		padding: 20px; 
-			border: 2px solid #CCC; 
-			margin-bottom: 20px; 
-			background-color:#FFF
-		}
-		#floating-panel
-		{
-			position: absolute;
-		  	top: 20px;
-		  	/* left: 50%; */
-		  	z-index: 5;
-		  	background-color: #fff;
-		  	padding: 5px;
-		  	border: 1px solid #999;
-		  	text-align: center;
-		  	font-family: 'Roboto','sans-serif';
-		  	line-height: 30px;
-		  	padding-left: 10px;
-		}
-    </style>
+		<title>PoI</title>
+		<link rel="stylesheet" type="text/css" href="css/main.css">
     	<!-- Latest compiled and minified CSS for bootstrap -->
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" 
 		integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
@@ -53,25 +13,49 @@
 	</head>
 	<body>
 		<div id="header"></div>
-		<div class="row">
-			<div id="map-outer" class="col-md-8 col-md-offset-1">
-			    <div id="floating-panel">
-			      <input onclick="clearMarkers();" type=button value="Hide Markers">
-			      <input onclick="showMarkers();" type=button value="Show All Markers">
-			      <input onclick="deleteMarkers();" type=button value="Delete Markers">
-			    </div>
-	  			<div id="map-inner"></div>
-	      	</div>
-	      	<div class="col-md-2">
-	      		<div id="panel-outer" class="row">
-		      		<div id="panel-inner" class="panel panel-default">
-						<div class="panel-heading" align="middle"><strong>Points on the Map</strong></div>
+		<div class="container">
+			<div class="jumbotron">
+  				<p>Search for an address: </p>
+  				<p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a></p>
+			</div>
+		</div>
+		<div class="container">
+			<div class="row">
+				<div id="map-outer" class="col-md-9">
+					<div id="floating-panel">						
+						<button onclick="clearMarkers();" title="Hide Markers">
+							<b>Hide Markers</b>
+							<span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+						</button>
+						<button onclick="showMarkers();" title="Show All Markers">
+							<b>Show Markers</b>
+							<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+						</button>
+						<button onclick="deleteMarkers();" title="Delete Markers">
+							<b>Remove All</b>
+							<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+						</button>
+				    </div>
+				    <div id="centerButton">
+				    	<button onclick="centerMapOnCurrentLocation()" title="Center Map on Current Location">
+<!-- 				    		<span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> -->
+				    		<img src="img/centerIcon.png" height="20" width="20">
+				    	</button>
+				    </div>
+		  			<div id="map-inner"></div>
+		      	</div>
+				<div class="col-md-3">
+		      		<div id="panel-outer" class="row">
+		      			<div class="panel-heading" align="middle"><strong>Points on the Map</strong></div>
+			      		<div id="panel-inner" class="panel panel-default">
+							
+						</div>
 					</div>
-				</div>
-				<div align="center" class="row">
-					<button type="button" class="btn btn-default btn-lg">Find the Center Point</button>
-				</div>
-	      	</div>
+		      	</div>
+			</div>
+		</div>
+		<div align="center" class="row">
+			<button type="button" class="btn btn-default btn-lg">Find the Center Point</button>
 		</div>
 		<div id="footer"></div>
 	</body>
@@ -85,128 +69,232 @@
 		src="https://maps.googleapis.com/maps/api/js?key=AIzaSyARilHXTyOd50Ad_ZhZtcSljCKyRC2QxoQ&signed_in=false">
     </script>
 	<script>
-		$(function(){
+		$(function()
+		{
 			$("#header").load("header.html");
 			$("#footer").load("footer.html");
 			initMap();
 		});
 		
-		function closePanel(){
+		function closePanel()
+		{
 			alert("close: ");
 		    $(this).parent().fadeOut();
 		}
 		
 		var map;
 		var markers = [];
-		var initialLocation;
+		var nodes = [];
+		
 		var siberia = new google.maps.LatLng(60, 105);
 		var newyork = new google.maps.LatLng(40.69847032728747, -73.9514422416687);
-		var browserSupportFlag =  new Boolean();
+		var currentLocationMarker;
 		
 		function initMap()
 		{
-			map = new google.maps.Map(document.getElementById("map-inner"),{
-				zoom: 12,
-			    mapTypeId: google.maps.MapTypeId.ROADMAP,
+			var initialLocation;
+
+			map = new google.maps.Map
+			(
+				document.getElementById("map-inner"),
+				{
+					zoom: 12,
+			    	mapTypeId: google.maps.MapTypeId.ROADMAP,
 			    
-			    mapTypeControl: true,
-			    mapTypeControlOptions: {
-			        style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
-			        position: google.maps.ControlPosition.BOTTOM_CENTER
-			    },
-			    zoomControl: true,
-			    zoomControlOptions: {
-			        position: google.maps.ControlPosition.LEFT_CENTER
-			    },
-			    scaleControl: true,
-			    streetViewControl: false,
-			    draggableCursor : "url(http://s3.amazonaws.com/besport.com_images/status-pin.png)"
-			});
+			    	mapTypeControl: true,
+			    	mapTypeControlOptions:
+			    	{
+			        	style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+			        	position: google.maps.ControlPosition.BOTTOM_CENTER
+			    	},
+			    	zoomControl: true,
+			    	zoomControlOptions:
+			    	{
+			        	position: google.maps.ControlPosition.LEFT_CENTER
+			    	},
+			    	scaleControl: true,
+			    	streetViewControl: false,
+			    	draggableCursor : 'crosshair',
+				}
+			);
 			
-			if(navigator.geolocation){
+			var browserSupportFlag =  new Boolean();
+			if(navigator.geolocation)
+			{
 			 	browserSupportFlag = true;
-			    navigator.geolocation.getCurrentPosition(function(position){
-			    	initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
-			    	map.setCenter(initialLocation);
-			    	
-			    	//Put a blue dot on your current location
-			    	var marker = new google.maps.Marker({
-	    				position: initialLocation,
-	    				title: 'Your Current Location\n'+initialLocation,
-	    				map: map,
-	    				icon: {url:'img/currentLocation.svg', scaledSize: new google.maps.Size(20,20)}
-	    			});
-			    	
-			    	//set the listener for each map click
-					map.addListener('click', function( event ){
-						//add marker to the map/array
-						addMarker(event.latLng);
-						
-						//put marker info on sidebar
-						var lat = event.latLng.lat();
-						var lon = event.latLng.lng();
-						document.getElementById('panel-inner').innerHTML += 
-							'<div class="alert alert-default alert-dismissible" role="alert">'+
-							'<button type="button" class="close" aria-hidden="true" onclick="closePanel()">&times;</button>'+
-							'<p>Latitude: ' + lat + ', Longitude: ' + lon + '</p>'+
-							'</div>'
-					});
-			    	
-				//map.controls[google.maps.ControlPosition.BOTTOM_RIGHT].push(myButton());
-			    				    	
-				}, function(){
-					handleNoGeolocation(browserSupportFlag);
-			    });
-			} else { // Browser doesn't support Geolocation
+			    navigator.geolocation.getCurrentPosition
+			    (
+			    	function(position)
+			    	{
+				    	initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
+				    	map.setCenter(initialLocation);
+				    	
+				    	//Put a blue dot on your current location
+				    	currentLocationMarker = new google.maps.Marker
+				    	(
+				    		{
+		    					position: initialLocation,
+		    					title: 'Your Current Location\n'+initialLocation,
+		    					map: map,
+		    					icon: {url:'img/currentLocation.png', scaledSize: new google.maps.Size(50,50)}
+		    				}
+				    	);
+				    	
+				    	//set the listener for each map click
+						map.addListener
+						(
+							'click',
+							function(event)
+							{
+								//add marker to the map
+								addMarker(event.latLng);
+								
+								//put marker info on sidebar
+								var lat = event.latLng.lat();
+								var lon = event.latLng.lng();
+								document.getElementById('panel-inner').innerHTML += 
+								'<div class="alert alert-default alert-dismissible" role="alert">'+
+								//'<button type="button" class="close" aria-hidden="true" onclick="closePanel()">&times;</button>'+
+								'Latitude: ' + lat + '<br>' +
+								'Longitude: ' + lon + '<br>' +
+								'Weight: '+
+								'<select onchange="updateNodes()">'+
+									'<option value="1" selected>1</option>'+
+								  	'<option value="2">2</option>'+
+								  	'<option value="3">3</option>'+
+								  	'<option value="4">4</option>'+
+								  	'<option value="5">5</option>'+
+								'</select>'+
+								'</div>'
+							}
+						);
+						//map.controls[google.maps.ControlPosition.BOTTOM_RIGHT].push(myButton());
+					},
+					function()
+					{
+						handleNoGeolocation(browserSupportFlag);
+			    	}
+				);
+			}
+			else// Browser doesn't support Geolocation
+			{
 				browserSupportFlag = false;
 				handleNoGeolocation(browserSupportFlag);
 			}
+		}
+
+		function centerMapOnCurrentLocation()
+		{
+			var browserSupportFlag =  new Boolean();
+			if(navigator.geolocation)
+			{
+				browserSupportFlag = true;
+				navigator.geolocation.getCurrentPosition
+				(
+					function(position)
+					{
+						var currentLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
 						
-			function handleNoGeolocation(errorFlag){
-				if (errorFlag == true){
-					alert("Geolocation service failed.");
-			      	initialLocation = newyork;
-			    } else {
-					alert("Your browser doesn't support geolocation. We've placed you in Siberia.");
-			      	initialLocation = siberia;
-			    }
-			    map.setCenter(initialLocation);
+						//remove original currentLocationMarker from map
+						currentLocationMarker.setMap(null);
+						
+						//pan to the user's current location on the map
+						map.panTo(currentLocation);
+						
+				    	//Put a blue dot on the user's current location
+				    	currentLocationMarker = new google.maps.Marker
+				    	(
+				    		{
+		    					position: currentLocation,
+		    					title: 'Your Current Location\n'+currentLocation,
+		    					map: map,
+		    					icon: {url:'img/currentLocation.png', scaledSize: new google.maps.Size(50,50)}
+		    				}
+				    	);
+					},
+					function()
+					{
+						handleNoGeolocation(browserSupportFlag);
+			    	}
+				);
+			}
+			else
+			{
+				browserSupportFlag = false;
+				handleNoGeolocation(browserSupportFlag);
 			}
 		}
 		
-		function addMarker(location){
+		function handleNoGeolocation(errorFlag)
+		{
+			if(errorFlag == true)
+			{
+				alert("Geolocation service failed.");
+				map.setCenter(newyork);
+		    }
+			else
+			{
+				alert("Your browser doesn't support geolocation. We've placed you in Siberia.");
+				map.setCenter(siberia);
+		    }
+		}
+		
+		function addMarker(location)
+		{
 			var lat = location.lat();
 			var lon = location.lng();
-		    var marker = new google.maps.Marker({
-		        position: location,
-		        title: 'Latitude: ' + lat + ', Longitude: ' + lon,
-		        map: map,
-//			        icon: {url:'img/redCrossPoint.svg', scaledSize: new google.maps.Size(20,20)}
-		    });
+		    var marker = new google.maps.Marker
+		    (
+		    	{
+		        	position: location,
+		        	title: 'Latitude: ' + lat + ', Longitude: ' + lon,
+		        	map: map,
+					//icon: {url:'img/redCrossPoint.svg', scaledSize: new google.maps.Size(20,20)}
+		    	}
+		    );
 		    markers.push(marker);
+		    nodes.push({lat: lat, lon: lon, weight: 1});
+		    
+			//console.log(nodes);
+			//console.log(marker);
+		}
+		
+		
+		function updateNodes()
+		{
+			alert("update nodes");
 		}
 		
 		// Sets the map on all markers in the array.
-		function setMapOnAll(map) {
-		  for (var i = 0; i < markers.length; i++) {
-		    markers[i].setMap(map);
-		  }
+		function setMapOnAll(map)
+		{
+			for (var i = 0; i < markers.length; i++)
+			{
+		    	markers[i].setMap(map);
+		  	}
 		}
 
 		// Removes the markers from the map, but keeps them in the array.
-		function clearMarkers() {
-		  setMapOnAll(null);
+		function clearMarkers()
+		{
+			setMapOnAll(null);
 		}
 
 		// Shows any markers currently in the array.
-		function showMarkers() {
-		  setMapOnAll(map);
+		function showMarkers()
+		{
+			setMapOnAll(map);
 		}
 
 		// Deletes all markers in the array by removing references to them.
-		function deleteMarkers() {
-		  clearMarkers();
-		  markers = [];
+		function deleteMarkers()
+		{
+			clearMarkers();
+		  	markers = [];
+		  	nodes = [];
+		  	document.getElementById('panel-inner').innerHTML = "";
 		}
+		
+
     </script>
 </html>
