@@ -15,8 +15,19 @@
 		<div id="header"></div>
 		<div class="container">
 			<div class="jumbotron">
-  				<p>Search for an address: </p>
-  				<p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a></p>
+				<div class="row">
+					<div class="col-md-10">
+			  			<div class="input-group">
+							<span class="input-group-addon" id="basic-addon1">
+								<span class="glyphicon glyphicon-globe" aria-hidden="true"></span>
+							</span>
+							<input type="text" class="form-control" placeholder="Address" aria-describedby="basic-addon1">
+						</div>
+					</div>
+					<div class="col-md-2" align="center">
+			  			<a class="btn btn-primary btn-lg" href="#" role="button">Place Marker</a>
+					</div>
+	  			</div>
 			</div>
 		</div>
 		<div class="container">
@@ -47,16 +58,19 @@
 				<div class="col-md-3">
 		      		<div id="panel-outer" class="row">
 		      			<div class="panel-heading" align="middle"><strong>Points on the Map</strong></div>
-			      		<div id="panel-inner" class="panel panel-default">
-							
-						</div>
+			      		<div id="panel-inner" class="panel panel-default"></div>
 					</div>
 		      	</div>
 			</div>
+			<div class="row">
+				<div class="col-md-12" align="center">
+		  			<a class="btn btn-primary btn-lg" href="#" role="button">Find the Center Point</a>
+				</div>
+			</div>
 		</div>
-		<div align="center" class="row">
-			<button type="button" class="btn btn-default btn-lg">Find the Center Point</button>
-		</div>
+<!-- 		<div align="center" class="row"> -->
+<!-- 			<button type="button" class="btn btn-default btn-lg">Find the Center Point</button> -->
+<!-- 		</div> -->
 		<div id="footer"></div>
 	</body>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
@@ -166,6 +180,24 @@
 								  	'<option value="5">5</option>'+
 								'</select>'+
 								'</div>'
+								
+								//Send shit to adis
+								$.ajax({
+									type: "POST",
+									url: "http://poiservice.adiskovacevic.com/api/PoI/Mean",
+									crossDomain: true,
+									data: '[{"Latitude": 2,"Longitude": 1,"Weight": 1}]',
+									
+// 									contentType: "application/json"
+// 									dataType: 'application/json',
+									
+									success: function(result) {
+							        	console.log("success: " + result);
+							    	},
+									error: function(result) {
+							        	console.log("error: " + result);
+							    	}
+								});
 							}
 						);
 						//map.controls[google.maps.ControlPosition.BOTTOM_RIGHT].push(myButton());
