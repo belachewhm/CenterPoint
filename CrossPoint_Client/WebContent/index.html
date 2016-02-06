@@ -12,65 +12,68 @@
 		integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
 	</head>
 	<body>
-		<div id="header"></div>
-		<div class="container">
-			<div class="jumbotron">
-				<div class="row">
-					<div class="col-md-10">
-			  			<div class="input-group">
-							<span class="input-group-addon" id="basic-addon1">
-								<span class="glyphicon glyphicon-globe" aria-hidden="true"></span>
-							</span>
-							<input type="text" class="form-control" placeholder="Address" aria-describedby="basic-addon1">
+		<div class="wrapper">
+			<div id="header"></div>
+			<div class="container">
+				<div class="jumbotron">
+					<div class="row">
+						<div class="col-md-10">
+				  			<div class="input-group">
+								<span class="input-group-addon" id="basic-addon1">
+									<span class="glyphicon glyphicon-globe" aria-hidden="true"></span>
+								</span>
+								<input type="text" class="form-control" placeholder="Address" aria-describedby="basic-addon1">
+							</div>
 						</div>
-					</div>
-					<div class="col-md-2" align="center">
-			  			<a class="btn btn-primary btn-lg" href="#" role="button">Place Marker</a>
-					</div>
-	  			</div>
-			</div>
-		</div>
-		<div class="container">
-			<div class="row">
-				<div id="map-outer" class="col-md-9">
-					<div id="floating-panel">						
-						<button onclick="clearMarkers();" title="Hide Markers">
-							<b>Hide Markers</b>
-							<span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
-						</button>
-						<button onclick="showMarkers();" title="Show All Markers">
-							<b>Show Markers</b>
-							<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
-						</button>
-						<button onclick="deleteMarkers();" title="Delete Markers">
-							<b>Remove All</b>
-							<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-						</button>
-				    </div>
-				    <div id="centerButton">
-				    	<button onclick="centerMapOnCurrentLocation()" title="Center Map on Current Location">
-<!-- 				    		<span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> -->
-				    		<img src="img/centerIcon.png" height="20" width="20">
-				    	</button>
-				    </div>
-		  			<div id="map-inner"></div>
-		      	</div>
-				<div class="col-md-3">
-		      		<div id="panel-outer" class="row">
-		      			<div class="panel-heading" align="middle"><strong>Points on the Map</strong></div>
-			      		<div id="panel-inner" class="panel panel-default"></div>
-					</div>
-		      	</div>
-			</div>
-			<div class="row">
-				<div class="col-md-12" align="center">
-		  			<a class="btn btn-primary btn-lg" href="#" role="button">Find the Center Point</a>
+						<br>
+						<div class="col-md-2" align="center">
+				  			<a class="btn btn-primary btn-lg" href="#" role="button">Place Marker</a>
+						</div>
+		  			</div>
 				</div>
 			</div>
+			<div class="container">
+				<div class="row">
+					<div id="map-outer" class="col-md-9">
+						<div id="floating-panel">						
+							<button onclick="clearMarkers();" title="Hide Markers">
+								<b>Hide Markers</b>
+								<span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+							</button>
+							<button onclick="showMarkers();" title="Show All Markers">
+								<b>Show Markers</b>
+								<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+							</button>
+							<button onclick="deleteMarkers();" title="Delete Markers">
+								<b>Remove All</b>
+								<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+							</button>
+					    </div>
+					    <div id="centerButton">
+					    	<button onclick="centerMapOnCurrentLocation()" title="Center Map on Current Location">
+	<!-- 				    		<span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> -->
+					    		<img src="img/centerIcon.png" height="20" width="20">
+					    	</button>
+					    </div>
+			  			<div id="map-inner"></div>
+			      	</div>
+					<div class="col-md-3">
+			      		<div id="panel-outer" class="row">
+			      			<div class="panel-heading" align="middle"><strong>Points on the Map</strong></div>
+				      		<div id="panel-inner" class="panel panel-default"></div>
+						</div>
+			      	</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12" align="center">
+			  			<a class="btn btn-primary btn-lg" onclick="findCenterPoint();" role="button">Find the Center Point</a>
+					</div>
+				</div>
+			</div>
+			<div class="push"></div>
 		</div>
-<!-- 		<div align="center" class="row"> -->
-<!-- 			<button type="button" class="btn btn-default btn-lg">Find the Center Point</button> -->
-<!-- 		</div> -->
+		<br>
+		<br>
 		<div id="footer"></div>
 	</body>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
@@ -89,6 +92,11 @@
 			$("#footer").load("footer.html");
 			initMap();
 		});
+		
+		function findCenterPoint()
+		{
+			alert("find the center point");
+		}
 		
 		function closePanel()
 		{

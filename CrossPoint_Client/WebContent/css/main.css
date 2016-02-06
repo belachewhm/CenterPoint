@@ -1,35 +1,46 @@
-body
-{
-	height: 100%;
-	background-color:#CCC;
-	padding-bottom: 20px;
+* {
+    margin: 0;
+    border-radius: 0 !important;
 }
 
-.main
-{
+html, body {
+    height: 100%;
+}
+
+body {
+	height: 100%;
+/* 	background-color:#CCC; */
+/* 	padding-bottom: 20px; */
+	background: url('img/background1.jpg');
+}
+
+.wrapper {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin: 0 auto -155px; /* the bottom margin is the negative value of the footer's height */
+}
+
+.main {
 	border: 2px solid #000; 
 }
 
-#map-inner
-{
+#map-inner {
 	height: 700px;
 }
 	
-#map-outer
-{
+#map-outer {
 	height: 750px;
  	padding: 20px; 
 	margin-bottom: 20px; 
 }
 	
-#panel-inner
-{
+#panel-inner {
 	height: 675px;
 	overflow-y: scroll;
 }
 	
-#panel-outer
-{
+#panel-outer {
     height: 750px;
  	padding: 10px; 
 	
@@ -37,8 +48,7 @@ body
 	background-color:#FFF;
 }
 	
-#floating-panel
-{
+#floating-panel {
 	position: absolute;
   	top: 20px;
   	/* left: 50%; */
@@ -52,8 +62,7 @@ body
   	padding-left: 10px;
 }
 
-#centerButton
-{
+#centerButton {
 	position: absolute;
   	top: 90%;
   	left: 92%;
@@ -67,4 +76,8 @@ body
   	font-family: 'Roboto','sans-serif';
   	line-height: 30px;
 /*   	padding-left: 10px; */
+}
+
+.footer, .push {
+    height: 155px; /* .push must be the same height as .footer */
 }
